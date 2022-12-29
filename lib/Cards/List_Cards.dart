@@ -18,12 +18,15 @@ class _ListCardsState extends State<ListCards> {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: InkWell(
-        onTap: (){
+        onLongPress: (){
           Navigator.pushNamed(context, kEditRoute);
+        },
+        onTap: (){
+          Navigator.pushNamed(context, kViewWordList);
         },
         child: Container(
           height: MediaQuery.of(context).size.width / 4,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.lightBlueAccent,
             borderRadius: BorderRadius.all(
               Radius.circular(20),

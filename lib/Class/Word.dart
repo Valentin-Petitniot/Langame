@@ -1,5 +1,3 @@
-
-
 class Word {
   String original;
   String translate;

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const List<String> lgList = <String>['Fr', 'En', 'De', 'Nl'];
+
 class AddWordCard extends StatefulWidget {
   const AddWordCard({Key? key}) : super(key: key);
 
@@ -8,68 +10,86 @@ class AddWordCard extends StatefulWidget {
 }
 
 class _AddWordCardState extends State<AddWordCard> {
+  String dropDownValue = lgList.first;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: EdgeInsets.all(10),
       child: Container(
-        height: 200,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.black,
-            border: Border.all(
-              color: Colors.black,
-            ),
-            borderRadius: BorderRadius.all(
-              Radius.circular(30),
-            ),
+        width: double.infinity,
+        height: 150,
+        decoration: const BoxDecoration(
+          color: Colors.lightBlueAccent,
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
           ),
-          child: Row(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                      width: 200,
-                      child: TextField(
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Mot Français',
-                          hintStyle: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 12,
-                          ),
-                        ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
+                  child: SizedBox(
+                    width: 250,
+                    height: 50,
+                    child: TextField(
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                        hintText: 'Mot Français',
                       ),
                     ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: SizedBox(
-                        height: 30,
-                        width: 200,
-                        child: TextField(
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                          decoration: InputDecoration(
-                            label: Text('Mot Anglais'),
-                            hintStyle: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: SizedBox(
+                    width: 250,
+                    height: 50,
+                    child: TextField(
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                      ),
+                      decoration: InputDecoration(
+                        border: UnderlineInputBorder(),
+                        hintText: 'Traduction',
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+            DropdownButton<String>(
+              value: dropDownValue,
+              icon: const Icon(Icons.arrow_downward),
+              elevation: 16,
+              style: const TextStyle(color: Colors.white),
+              underline: Container(
+                height: 2,
+                color: Colors.white,
               ),
-            ],
-          ),
+              onChanged: (String? value) {
+                setState(
+                  () {
+                    dropDownValue = value!;
+                  },
+                );
+              },
+              items: lgList.map<DropdownMenuItem<String>>((String value){
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+          ],
         ),
       ),
     );
