@@ -10,9 +10,11 @@ import '../Screens/Edit_List_Screen.dart';
 
 class ListCards extends StatefulWidget {
 
-  final ListOfWord test;
+  const ListCards({Key? key, required this.name, required this.language}) : super(key: key);
 
-  const ListCards({Key? key, required this.test}) : super(key: key);
+
+  final String name;
+  final String language;
 
   @override
   State<ListCards> createState() => _ListCardsState();
@@ -46,7 +48,7 @@ class _ListCardsState extends State<ListCards> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(40, 0, 0, 0),
                     child: Text(
-                      widget.test.name,
+                      widget.name,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
@@ -66,22 +68,20 @@ class _ListCardsState extends State<ListCards> {
                         padding: const EdgeInsets.fromLTRB(0, 0, 2, 35),
                         child: ModifListButton(
                           onPressed: () {
-                            Word Testword = Word(original: 'oui', translate: 'yes');
-                            widget.test.wordList.add(Testword);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => EditListScreen(test: widget.test),
+                                builder: (context) => EditListScreen(),
                               ),
                             );
                           }
                         ),
                       ),
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.fromLTRB(0, 0, 10, 10),
                         child: Text(
-                          'Anglais',
-                          style: TextStyle(
+                          widget.language,
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
                             fontStyle: FontStyle.italic,

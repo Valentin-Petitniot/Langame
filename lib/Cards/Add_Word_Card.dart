@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-const List<String> lgList = <String>['En', 'Fr', 'Nl', 'De'];
 
 class AddWordCard extends StatefulWidget {
   const AddWordCard({Key? key}) : super(key: key);
@@ -10,7 +9,7 @@ class AddWordCard extends StatefulWidget {
 }
 
 class _AddWordCardState extends State<AddWordCard> {
-  String dropDownValue = lgList.first;
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,33 +64,6 @@ class _AddWordCardState extends State<AddWordCard> {
                   ),
                 )
               ],
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(60, 50, 0, 0),
-              child: DropdownButton<String>(
-                value: dropDownValue,
-                icon: const Icon(Icons.arrow_downward),
-                elevation: 16,
-                style: const TextStyle(color: Colors.white),
-                underline: Container(
-                  height: 2,
-                  color: Colors.black,
-                ),
-                onChanged: (String? value) {
-                  setState(
-                    () {
-                      dropDownValue = value!;
-                    },
-                  );
-                },
-                dropdownColor: Colors.black,
-                items: lgList.map<DropdownMenuItem<String>>((String value){
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
             ),
           ],
         ),

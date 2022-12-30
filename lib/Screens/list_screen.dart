@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:langame/Class/List_of_Words.dart';
+import 'package:langame/Class/Word.dart';
 
 import 'package:langame/Routes/router.dart';
 import 'package:langame/Cards/List_Cards.dart';
@@ -13,9 +14,7 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-
-
-  ListOfWord test = ListOfWord(name: 'test');
+  List<ListOfWord> data = [];
 
   Offset _tapPosition = Offset.zero;
 
@@ -49,84 +48,92 @@ class _ListScreenState extends State<ListScreen> {
     );
 
     // Implement the logic for each choice here
-    /*switch (result) {
+    switch (result) {
       case 'Supprimer':
         setState(() {
           data.removeAt(index);
         });
-    }*/
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Row(
-          children: [
-            Padding(
-              padding:
-                  EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
-            ),
-            Icon(Icons.list),
-            Padding(
-              padding: EdgeInsets.only(left: 10),
-            ),
-            Text('Listes de mots'),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => EditListScreen(test: test),
-            ),
-          );
-        },
-        backgroundColor: Colors.deepPurpleAccent,
-        tooltip: 'Ajout de Liste',
-        label: Icon(Icons.add),
-        shape: CircleBorder(
-          side: BorderSide(
-            color: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          title: Row(
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width / 6),
+              ),
+              Icon(Icons.list),
+              Padding(
+                padding: EdgeInsets.only(left: 10),
+              ),
+              Text('Listes de mots'),
+            ],
           ),
         ),
-      ),
-      drawer: Drawer(
-        width: MediaQuery.of(context).size.width / 2,
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.list),
-              title: Text('Listes'),
-              onTap: () {
-                Navigator.pushNamed(context, kListRoute);
-              },
-            )
-          ],
+        drawer: Drawer(
+          width: MediaQuery.of(context).size.width / 2,
+          child: ListView(
+            children: [
+              ListTile(
+                leading: Icon(Icons.list),
+                title: Text('Listes'),
+                onTap: () {
+                  Navigator.pushNamed(context, kListRoute);
+                },
+              )
+            ],
+          ),
         ),
-      ),
-      body: Container(
-        color: Colors.black54,
-        width: double.infinity,
-        height: double.infinity,
-        child: ListView.builder(
-          itemCount: 1, //Devra prendre le nombre ListOfWord dans la liste
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTapDown: (details) => _getTapPosition(details),
-              onLongPress: () {
-                _showContextMenu(context, index);
-              },
-              child: ListCards(
-                test: test,
-              ),
-            );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.of(context)
+                .push<ListOfWord>(
+                    MaterialPageRoute(builder: (_) => EditListScreen()))
+                .then((value) => setState(() {
+                      if (value?.name != "" && value?.language != "") {
+                        print('add list');
+                        data.add(ListOfWord(
+                            name: value!.name, language: value.language));
+                      }
+                    }));
           },
+          child: Icon(Icons.add),
         ),
-      ),
-    );
+        body: data.isNotEmpty
+            ? Container(
+                color: Colors.black54,
+                width: double.infinity,
+                height: double.infinity,
+                child: ListView.builder(
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTapDown: (details) => _getTapPosition(details),
+                      onLongPress: () {
+                        _showContextMenu(context, index);
+                      },
+                      child: Center(
+                        child: ListTile(
+                          title: Text(data[index].name),
+                          subtitle: Text(data[index].language),
+                          leading: Icon(Icons
+                              .emoji_people), /*ListCards(
+                        name: data[index].name,
+                        language: data[index].language,
+                      ),*/
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+            : const Center(
+                child: Text('Pas de liste enregistrer'),
+              ));
   }
 }

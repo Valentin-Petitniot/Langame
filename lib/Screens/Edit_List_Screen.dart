@@ -4,24 +4,37 @@ import 'package:langame/Button/Add_Word_Button.dart';
 import 'package:langame/Cards/Add_Word_Card.dart';
 import 'package:langame/Class/List_of_Words.dart';
 
-class EditListScreen extends StatefulWidget {
-   EditListScreen({Key? key, required this.test}) : super(key: key);
+const List<String> lgList = <String>['En', 'Fr', 'Nl', 'De'];
 
-  final ListOfWord test;
+class EditListScreen extends StatefulWidget {
+   const EditListScreen({Key? key}) : super(key: key);
 
   @override
   State<EditListScreen> createState() => _EditListScreenState();
 }
 
 final List<Widget> wordList = [];
+int num = 0;
 
-void addWordList() {
-  wordList.add(
-     const AddWordCard(),
-  );
-}
 
 class _EditListScreenState extends State<EditListScreen> {
+
+  TextEditingController nameCtrl = TextEditingController();
+  late String languageCtrl;
+
+  void addWordList() {
+    wordList.add(
+      const AddWordCard(),
+    );
+  }
+
+  String dropDownValue = lgList.first;
+  
+  onPressed(BuildContext context){
+    var data = ListOfWord(name: nameCtrl.text, language: languageCtrl);
+    Navigator.pop(context, data);
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -47,7 +60,7 @@ class _EditListScreenState extends State<EditListScreen> {
                 padding: const EdgeInsets.only(left: 85),
                 child: AddWordButton(
                   onPressed: () {
-                    widget.test.nbrelem++;
+                    num++;
                     setState(
                       () {
                         addWordList();
@@ -65,6 +78,44 @@ class _EditListScreenState extends State<EditListScreen> {
           color: Colors.black38,
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+                child: DropdownButton<String>(
+                  value: dropDownValue,
+                  icon: const Icon(Icons.arrow_downward),
+                  elevation: 16,
+                  style: const TextStyle(color: Colors.white),
+                  underline: Container(
+                    height: 2,
+                    color: Colors.black,
+                  ),
+                  onChanged: (String? value) {
+                    setState(
+                          () {
+                        dropDownValue = value!;
+                        switch(value)
+                        {
+                          case 'En': languageCtrl = 'Anglais';
+                          break;
+                          case 'Fr': languageCtrl = 'Français';
+                          break;
+                          case 'Nl': languageCtrl = 'Néerlandais';
+                          break;
+                          case 'De': languageCtrl = 'Allemand';
+                          break;
+                        }
+                      },
+                    );
+                  },
+                  dropdownColor: Colors.black,
+                  items: lgList.map<DropdownMenuItem<String>>((String value){
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
@@ -85,13 +136,20 @@ class _EditListScreenState extends State<EditListScreen> {
                       decoration: InputDecoration(
                         border: InputBorder.none,
                       ),
+                      validator: (value) {
+                        var newValue = value ?? "";
+                        if(newValue.isEmpty) {
+                          return 'title is required';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ),
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: widget.test.nbrelem+1,
+                  itemCount: num,
                   itemBuilder: (context, index) {
                     return AddWordCard();
                   },
@@ -99,6 +157,14 @@ class _EditListScreenState extends State<EditListScreen> {
               ),
             ],
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: (){
+            if(Form.of(context)?.validate() ?? false){
+              onPressed(context);
+            }
+          },
+          child: Icon(Icons.save),
         ),
       ),
     );
