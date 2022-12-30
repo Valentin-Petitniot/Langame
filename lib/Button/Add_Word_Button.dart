@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:langame/Cards/Add_Word_Card.dart';
-
 class AddWordButton extends StatelessWidget {
   const AddWordButton({super.key, required this.onPressed});
 

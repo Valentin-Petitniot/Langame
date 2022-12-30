@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const List<String> lgList = <String>['Fr', 'En', 'De', 'Nl'];
+const List<String> lgList = <String>['En', 'Fr', 'Nl', 'De'];
 
 class AddWordCard extends StatefulWidget {
   const AddWordCard({Key? key}) : super(key: key);
@@ -29,9 +29,9 @@ class _AddWordCardState extends State<AddWordCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
-              children: [
+              children: const [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 10, 0, 0),
+                  padding:  EdgeInsets.fromLTRB(15, 10, 0, 0),
                   child: SizedBox(
                     width: 250,
                     height: 50,
@@ -48,7 +48,7 @@ class _AddWordCardState extends State<AddWordCard> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(left: 15),
+                  padding:  EdgeInsets.only(left: 15),
                   child: SizedBox(
                     width: 250,
                     height: 50,
@@ -66,28 +66,32 @@ class _AddWordCardState extends State<AddWordCard> {
                 )
               ],
             ),
-            DropdownButton<String>(
-              value: dropDownValue,
-              icon: const Icon(Icons.arrow_downward),
-              elevation: 16,
-              style: const TextStyle(color: Colors.white),
-              underline: Container(
-                height: 2,
-                color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(60, 50, 0, 0),
+              child: DropdownButton<String>(
+                value: dropDownValue,
+                icon: const Icon(Icons.arrow_downward),
+                elevation: 16,
+                style: const TextStyle(color: Colors.white),
+                underline: Container(
+                  height: 2,
+                  color: Colors.black,
+                ),
+                onChanged: (String? value) {
+                  setState(
+                    () {
+                      dropDownValue = value!;
+                    },
+                  );
+                },
+                dropdownColor: Colors.black,
+                items: lgList.map<DropdownMenuItem<String>>((String value){
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-              onChanged: (String? value) {
-                setState(
-                  () {
-                    dropDownValue = value!;
-                  },
-                );
-              },
-              items: lgList.map<DropdownMenuItem<String>>((String value){
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
             ),
           ],
         ),

@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
 import 'package:langame/Cards/Add_Word_Card.dart';
+import 'package:langame/Class/List_of_Words.dart';
 
 class EditListScreen extends StatefulWidget {
-  const EditListScreen({Key? key}) : super(key: key);
+   EditListScreen({Key? key, required this.test}) : super(key: key);
+
+  final ListOfWord test;
 
   @override
   State<EditListScreen> createState() => _EditListScreenState();
 }
 
-List<Widget> wordList = [];
-int num = 0;
+final List<Widget> wordList = [];
 
 void addWordList() {
   wordList.add(
-    const AddWordCard(),
+     const AddWordCard(),
   );
 }
-
 
 class _EditListScreenState extends State<EditListScreen> {
   @override
@@ -46,7 +47,7 @@ class _EditListScreenState extends State<EditListScreen> {
                 padding: const EdgeInsets.only(left: 85),
                 child: AddWordButton(
                   onPressed: () {
-                    num++;
+                    widget.test.nbrelem++;
                     setState(
                       () {
                         addWordList();
@@ -89,12 +90,11 @@ class _EditListScreenState extends State<EditListScreen> {
                 ),
               ),
               Expanded(
-                child: ListView(
-                  children: <Widget>[
-                    Column(
-                      children: wordList,
-                    )
-                  ],
+                child: ListView.builder(
+                  itemCount: widget.test.nbrelem+1,
+                  itemBuilder: (context, index) {
+                    return AddWordCard();
+                  },
                 ),
               ),
             ],
