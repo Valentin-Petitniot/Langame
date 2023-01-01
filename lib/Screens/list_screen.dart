@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:langame/Button/Modif_List_Button.dart';
 import 'package:langame/Class/List_of_Words.dart';
 import 'package:langame/Class/Word.dart';
 
 import 'package:langame/Routes/router.dart';
 import 'package:langame/Cards/List_Cards.dart';
 import 'package:langame/Screens/Edit_List_Screen.dart';
+import 'package:langame/Screens/New_List_Screen.dart';
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
@@ -15,7 +17,7 @@ class ListScreen extends StatefulWidget {
 
 class _ListScreenState extends State<ListScreen> {
   List<ListOfWord> data = [];
-
+  bool refresh = false;
   Offset _tapPosition = Offset.zero;
 
   void _getTapPosition(TapDownDetails details) {
@@ -56,6 +58,29 @@ class _ListScreenState extends State<ListScreen> {
     }
   }
 
+  Future<void> _navigatorAndDisplayListAdd(BuildContext context) async {
+    ListOfWord? result = await Navigator.push<ListOfWord>(context,
+        MaterialPageRoute(builder: (BuildContext context) => NewListScreen()));
+    if (result!.name != null) {
+      refresh = true;
+      data.add(ListOfWord(name: result.name, language: result.language));
+      if (!mounted) return;
+      print(result.name + result.language);
+    }
+  }
+
+  Future<void> _navigatorAndDisplayListEdit(BuildContext context, index) async {
+    ListOfWord? result = await Navigator.push<ListOfWord>(context,
+        MaterialPageRoute(builder: (BuildContext context) => EditListScreen(langList: data[index].language, nameList: data[index].name,)));
+    if (result!.name != null) {
+      refresh = true;
+      //data.removeAt(index);
+      data[index] = (ListOfWord(name: result.name, language: result.language));
+      if (!mounted) return;
+      print(result.name + result.language);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,20 +116,12 @@ class _ListScreenState extends State<ListScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            Navigator.of(context)
-                .push<ListOfWord>(
-                    MaterialPageRoute(builder: (_) => EditListScreen()))
-                .then((value) => setState(() {
-                      if (value?.name != "" && value?.language != "") {
-                        print('add list');
-                        data.add(ListOfWord(
-                            name: value!.name, language: value.language));
-                      }
-                    }));
+            refresh = false;
+            _navigatorAndDisplayListAdd(context);
           },
           child: Icon(Icons.add),
         ),
-        body: data.isNotEmpty
+        body: refresh
             ? Container(
                 color: Colors.black54,
                 width: double.infinity,
@@ -117,15 +134,14 @@ class _ListScreenState extends State<ListScreen> {
                       onLongPress: () {
                         _showContextMenu(context, index);
                       },
-                      child: Center(
-                        child: ListTile(
-                          title: Text(data[index].name),
-                          subtitle: Text(data[index].language),
-                          leading: Icon(Icons
-                              .emoji_people), /*ListCards(
+                      child: ListCards(
                         name: data[index].name,
                         language: data[index].language,
-                      ),*/
+                        child: ModifListButton(
+                          onPressed: () {
+                            refresh = false;
+                            _navigatorAndDisplayListEdit(context, index);
+                          },
                         ),
                       ),
                     );

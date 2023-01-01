@@ -6,38 +6,18 @@ import 'package:langame/Class/List_of_Words.dart';
 
 const List<String> lgList = <String>['Langue' ,'En', 'Fr', 'Nl', 'De'];
 
-class EditListScreen extends StatefulWidget {
-   const EditListScreen({Key? key, required this.nameList, required this.langList}) : super(key: key);
-
-   final String nameList;
-   final String langList;
+class NewListScreen extends StatefulWidget {
+  const NewListScreen({Key? key}) : super(key: key);
 
   @override
-  State<EditListScreen> createState() => _EditListScreenState();
+  State<NewListScreen> createState() => _NewListScreenState();
 }
 
 final List<Widget> wordList = [];
 int num = 0;
 
-String initialValueDropDown(String rcvLang){
-  String result = 'Langue';
 
-  switch(rcvLang)
-  {
-    case 'Anglais': result = 'En';
-    break;
-    case 'Français': result = 'Fr';
-    break;
-    case 'Allemand': result = 'De';
-    break;
-    case 'Néerlandais': result = 'Nl';
-    break;
-  }
-
-  return result;
-}
-
-class _EditListScreenState extends State<EditListScreen> {
+class _NewListScreenState extends State<NewListScreen> {
 
   TextEditingController nameCtrl = TextEditingController();
   late String languageCtrl;
@@ -49,6 +29,11 @@ class _EditListScreenState extends State<EditListScreen> {
   }
 
   String dropDownValue = lgList.first;
+
+  onPressed(BuildContext context){
+    var data = ListOfWord(name: nameCtrl.text, language: languageCtrl);
+    Navigator.pop(context, data);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,20 +49,20 @@ class _EditListScreenState extends State<EditListScreen> {
             children: [
               Padding(
                 padding:
-                    EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
+                EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
               ),
               Icon(Icons.list),
               Padding(
                 padding: EdgeInsets.only(left: 10),
               ),
-              Text('Modifier la Liste'),
+              Text('Nouvelle la Liste'),
               Padding(
                 padding: const EdgeInsets.only(left: 85),
                 child: AddWordButton(
                   onPressed: () {
                     num++;
                     setState(
-                      () {
+                          () {
                         addWordList();
                       },
                     );
@@ -96,7 +81,7 @@ class _EditListScreenState extends State<EditListScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
                 child: DropdownButton<String>(
-                  value: initialValueDropDown(widget.langList),
+                  value: dropDownValue,
                   icon: const Icon(Icons.arrow_downward),
                   elevation: 16,
                   style: const TextStyle(color: Colors.white),
@@ -112,10 +97,10 @@ class _EditListScreenState extends State<EditListScreen> {
                         switch(dropDownValue)
                         {
                           case 'En': languageCtrl = 'Anglais';
-                                      print('Anglais séléctionné');
+                          print('Anglais séléctionné');
                           break;
                           case 'Fr': languageCtrl = 'Français';
-                                      print(languageCtrl + ' séléctionné');
+                          print(languageCtrl + ' séléctionné');
                           break;
                           case 'Nl': languageCtrl = 'Néerlandais';
                           break;
@@ -148,12 +133,18 @@ class _EditListScreenState extends State<EditListScreen> {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: TextFormField(
-                      //initialValue: widget.nameList,
                       controller: nameCtrl,
                       autocorrect: true,
                       decoration: InputDecoration(
                         border: InputBorder.none,
                       ),
+                      validator: (value) {
+                        var newValue = value ?? "";
+                        if(newValue.isEmpty) {
+                          return 'title is required';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ),
@@ -174,11 +165,6 @@ class _EditListScreenState extends State<EditListScreen> {
             /*if(Form.of(context)?.validate() ?? false){
               onPressed(context);
             }*/
-
-            if(widget.langList != null)
-              {
-                languageCtrl = widget.langList;
-              }
             print('Edit_List_Screen ' + nameCtrl.text + languageCtrl);
             ListOfWord result = ListOfWord(name: nameCtrl.text, language: languageCtrl);
             Navigator.pop(context, result);

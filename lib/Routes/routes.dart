@@ -11,6 +11,5 @@ import 'package:langame/Screens/View_Words_List_Screen.dart';
 Map<String, WidgetBuilder> router = {
   kHomeRoute: (context) => MyApp(),
   kListRoute: (context) => const ListScreen(),
-  kEditRoute: (context) =>  EditListScreen(),
   kViewWordList: (context) => const ViewWordsListScreen(),
 };
