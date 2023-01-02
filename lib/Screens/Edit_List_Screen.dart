@@ -74,7 +74,7 @@ class _EditListScreenState extends State<EditListScreen> {
               ),
               Text('Modifier la Liste'),
               Padding(
-                padding: const EdgeInsets.only(left: 85),
+                padding: const EdgeInsets.only(left: 60),
                 child: AddWordButton(
                   onPressed: () {
                     setState(
@@ -91,7 +91,7 @@ class _EditListScreenState extends State<EditListScreen> {
         body: Container(
           height: double.infinity,
           width: double.infinity,
-          color: Colors.black38,
+          color: Colors.black54,
           child: Column(
             children: [
               ListCards(name: widget.nameList, language: widget.langList),
@@ -162,6 +162,7 @@ class _EditListScreenState extends State<EditListScreen> {
             ListOfWord result =
                 ListOfWord(name: widget.nameList, language: widget.langList);
             Navigator.pop(context, result);
+
           },
           child: Icon(Icons.save),
         ),

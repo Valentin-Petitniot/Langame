@@ -8,7 +8,7 @@ class AddWordButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 10,
+      width: 40,
       child: RawMaterialButton(
         onPressed: onPressed,
         fillColor: Colors.transparent,
