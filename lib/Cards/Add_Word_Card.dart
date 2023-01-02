@@ -10,6 +10,8 @@ class AddWordCard extends StatefulWidget {
 
 class _AddWordCardState extends State<AddWordCard> {
 
+  TextEditingController original = TextEditingController();
+  TextEditingController traduction = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -28,21 +30,22 @@ class _AddWordCardState extends State<AddWordCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
-              children: const [
+              children: [
                 Padding(
                   padding:  EdgeInsets.fromLTRB(15, 10, 0, 0),
                   child: SizedBox(
                     width: 250,
                     height: 50,
                     child: TextField(
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                       ),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         hintText: 'Mot Français',
                       ),
+                      controller: original,
                     ),
                   ),
                 ),
@@ -52,14 +55,15 @@ class _AddWordCardState extends State<AddWordCard> {
                     width: 250,
                     height: 50,
                     child: TextField(
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
                       ),
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: UnderlineInputBorder(),
                         hintText: 'Traduction',
                       ),
+                      controller: traduction,
                     ),
                   ),
                 )

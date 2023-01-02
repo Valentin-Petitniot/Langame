@@ -1,59 +1,61 @@
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
-import 'package:langame/Cards/Add_Word_Card.dart';
+import 'package:langame/Cards/List_Cards.dart';
 import 'package:langame/Class/List_of_Words.dart';
 
-const List<String> lgList = <String>['Langue' ,'En', 'Fr', 'Nl', 'De'];
+import '../Class/Word.dart';
+import '../Partials/Input_Word.dart';
+
+const List<String> lgList = <String>['Langue', 'En', 'Fr', 'Nl', 'De'];
 
 class EditListScreen extends StatefulWidget {
-   const EditListScreen({Key? key, required this.nameList, required this.langList}) : super(key: key);
+  const EditListScreen(
+      {Key? key, required this.nameList, required this.langList})
+      : super(key: key);
 
-   final String nameList;
-   final String langList;
+  final String nameList;
+  final String langList;
 
   @override
   State<EditListScreen> createState() => _EditListScreenState();
 }
 
-final List<Widget> wordList = [];
+final List<Widget> widgetWordList = [];
 int num = 0;
 
-String initialValueDropDown(String rcvLang){
+String initialValueDropDown(String rcvLang) {
   String result = 'Langue';
 
-  switch(rcvLang)
-  {
-    case 'Anglais': result = 'En';
-    break;
-    case 'Français': result = 'Fr';
-    break;
-    case 'Allemand': result = 'De';
-    break;
-    case 'Néerlandais': result = 'Nl';
-    break;
+  switch (rcvLang) {
+    case 'Anglais':
+      result = 'En';
+      break;
+    case 'Français':
+      result = 'Fr';
+      break;
+    case 'Allemand':
+      result = 'De';
+      break;
+    case 'Néerlandais':
+      result = 'Nl';
+      break;
   }
 
   return result;
 }
 
 class _EditListScreenState extends State<EditListScreen> {
-
   TextEditingController nameCtrl = TextEditingController();
   late String languageCtrl;
-
-  void addWordList() {
-    wordList.add(
-      const AddWordCard(),
-    );
-  }
+  final List<Word> _wordsList = [];
 
   String dropDownValue = lgList.first;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -63,8 +65,8 @@ class _EditListScreenState extends State<EditListScreen> {
           title: Row(
             children: [
               Padding(
-                padding:
-                    EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width / 6),
               ),
               Icon(Icons.list),
               Padding(
@@ -75,10 +77,9 @@ class _EditListScreenState extends State<EditListScreen> {
                 padding: const EdgeInsets.only(left: 85),
                 child: AddWordButton(
                   onPressed: () {
-                    num++;
                     setState(
                       () {
-                        addWordList();
+                        num++;
                       },
                     );
                   },
@@ -93,76 +94,61 @@ class _EditListScreenState extends State<EditListScreen> {
           color: Colors.black38,
           child: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-                child: DropdownButton<String>(
-                  value: initialValueDropDown(widget.langList),
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  style: const TextStyle(color: Colors.white),
-                  underline: Container(
-                    height: 2,
-                    color: Colors.black,
-                  ),
-                  onChanged: (String? value) {
-                    setState(
-                          () {
-                        dropDownValue = value!;
-                        print('changement de langue');
-                        switch(dropDownValue)
-                        {
-                          case 'En': languageCtrl = 'Anglais';
-                                      print('Anglais séléctionné');
-                          break;
-                          case 'Fr': languageCtrl = 'Français';
-                                      print(languageCtrl + ' séléctionné');
-                          break;
-                          case 'Nl': languageCtrl = 'Néerlandais';
-                          break;
-                          case 'De': languageCtrl = 'Allemand';
-                          break;
-                        }
-                      },
-                    );
-                  },
-                  dropdownColor: Colors.black,
-                  items: lgList.map<DropdownMenuItem<String>>((String value){
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 30,
-                  width: 300,
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlueAccent,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: TextFormField(
-                      //initialValue: widget.nameList,
-                      controller: nameCtrl,
-                      autocorrect: true,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              ListCards(name: widget.nameList, language: widget.langList),
               Expanded(
                 child: ListView.builder(
                   itemCount: num,
                   itemBuilder: (context, index) {
-                    return AddWordCard();
+                    return Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: const BoxDecoration(
+                          color: Colors.lightBlueAccent,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                  child: SizedBox(
+                                    width: 250,
+                                    height: 50,
+                                    child: WordInput(
+                                      hintText: 'Mot Original',
+                                      onChanged: (value){
+                                        _wordsList[index].original = value;
+                                        print('original: ' + _wordsList[index].original);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15),
+                                  child: SizedBox(
+                                    width: 250,
+                                    height: 50,
+                                    child: WordInput(
+                                      hintText: 'Mot Traduis',
+                                      onChanged: (value){
+                                        _wordsList[index].translate = value;
+                                        print('traduit: ' + _wordsList[index].translate);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -170,20 +156,12 @@ class _EditListScreenState extends State<EditListScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            /*if(Form.of(context)?.validate() ?? false){
-              onPressed(context);
-            }*/
-
-            if(widget.langList != null)
-              {
-                languageCtrl = widget.langList;
-              }
-            print('Edit_List_Screen ' + nameCtrl.text + languageCtrl);
-            ListOfWord result = ListOfWord(name: nameCtrl.text, language: languageCtrl);
-            Navigator.pop(context, result);
+          onPressed: () {
             num = 0;
-            wordList.clear();
+            widgetWordList.clear();
+            ListOfWord result =
+                ListOfWord(name: widget.nameList, language: widget.langList);
+            Navigator.pop(context, result);
           },
           child: Icon(Icons.save),
         ),

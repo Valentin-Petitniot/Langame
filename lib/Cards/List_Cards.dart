@@ -12,7 +12,6 @@ class ListCards extends StatefulWidget {
 
   const ListCards({Key? key, required this.name, required this.language, this.child}) : super(key: key);
 
-
   final String name;
   final String language;
   final Widget? child;
@@ -67,7 +66,7 @@ class _ListCardsState extends State<ListCards> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 0, 2, 35),
-                        child: widget.child!,
+                        child: widget.child,
                       ),
                       Padding(
                         padding: EdgeInsets.fromLTRB(0, 0, 10, 10),

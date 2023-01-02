@@ -73,11 +73,10 @@ class _ListScreenState extends State<ListScreen> {
     ListOfWord? result = await Navigator.push<ListOfWord>(context,
         MaterialPageRoute(builder: (BuildContext context) => EditListScreen(langList: data[index].language, nameList: data[index].name,)));
     if (result!.name != null) {
-      refresh = true;
-      //data.removeAt(index);
       data[index] = (ListOfWord(name: result.name, language: result.language));
       if (!mounted) return;
       print(result.name + result.language);
+      refresh = true;
     }
   }
 
@@ -121,7 +120,7 @@ class _ListScreenState extends State<ListScreen> {
           },
           child: Icon(Icons.add),
         ),
-        body: refresh
+        body: data.isNotEmpty
             ? Container(
                 color: Colors.black54,
                 width: double.infinity,

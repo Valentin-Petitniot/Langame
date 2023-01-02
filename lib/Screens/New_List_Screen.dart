@@ -30,11 +30,6 @@ class _NewListScreenState extends State<NewListScreen> {
 
   String dropDownValue = lgList.first;
 
-  onPressed(BuildContext context){
-    var data = ListOfWord(name: nameCtrl.text, language: languageCtrl);
-    Navigator.pop(context, data);
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -60,10 +55,8 @@ class _NewListScreenState extends State<NewListScreen> {
                 padding: const EdgeInsets.only(left: 85),
                 child: AddWordButton(
                   onPressed: () {
-                    num++;
-                    setState(
-                          () {
-                        addWordList();
+                    setState(() {
+                        num++;
                       },
                     );
                   },
@@ -162,9 +155,6 @@ class _NewListScreenState extends State<NewListScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: (){
-            /*if(Form.of(context)?.validate() ?? false){
-              onPressed(context);
-            }*/
             print('Edit_List_Screen ' + nameCtrl.text + languageCtrl);
             ListOfWord result = ListOfWord(name: nameCtrl.text, language: languageCtrl);
             Navigator.pop(context, result);
