@@ -1,10 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
 import 'package:langame/Cards/Add_Word_Card.dart';
 import 'package:langame/Class/List_of_Words.dart';
 
-const List<String> lgList = <String>['Langue' ,'En', 'Fr', 'Nl', 'De'];
+import '../Class/Word.dart';
+import '../Partials/Input_Word.dart';
+
+const List<String> lgList = <String>['Langue', 'En', 'Fr', 'Nl', 'De'];
 
 class NewListScreen extends StatefulWidget {
   const NewListScreen({Key? key}) : super(key: key);
@@ -13,27 +17,20 @@ class NewListScreen extends StatefulWidget {
   State<NewListScreen> createState() => _NewListScreenState();
 }
 
-final List<Widget> wordList = [];
+final List<Widget> widgetWordList = [];
 int num = 0;
 
-
 class _NewListScreenState extends State<NewListScreen> {
-
   TextEditingController nameCtrl = TextEditingController();
   late String languageCtrl;
-
-  void addWordList() {
-    wordList.add(
-      const AddWordCard(),
-    );
-  }
+  final List<Word> _wordsList = [];
 
   String dropDownValue = lgList.first;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -43,8 +40,8 @@ class _NewListScreenState extends State<NewListScreen> {
           title: Row(
             children: [
               Padding(
-                padding:
-                EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
+                padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width / 6),
               ),
               Icon(Icons.list),
               Padding(
@@ -52,11 +49,13 @@ class _NewListScreenState extends State<NewListScreen> {
               ),
               Text('Nouvelle la Liste'),
               Padding(
-                padding: const EdgeInsets.only(left: 85),
+                padding: const EdgeInsets.only(left: 60),
                 child: AddWordButton(
                   onPressed: () {
-                    setState(() {
+                    setState(
+                      () {
                         num++;
+                        _wordsList.add(Word.empty());
                       },
                     );
                   },
@@ -84,27 +83,30 @@ class _NewListScreenState extends State<NewListScreen> {
                   ),
                   onChanged: (String? value) {
                     setState(
-                          () {
+                      () {
                         dropDownValue = value!;
-                        print('changement de langue');
-                        switch(dropDownValue)
-                        {
-                          case 'En': languageCtrl = 'Anglais';
-                          print('Anglais séléctionné');
-                          break;
-                          case 'Fr': languageCtrl = 'Français';
-                          print(languageCtrl + ' séléctionné');
-                          break;
-                          case 'Nl': languageCtrl = 'Néerlandais';
-                          break;
-                          case 'De': languageCtrl = 'Allemand';
-                          break;
+
+                        switch (dropDownValue) {
+                          case 'En':
+                            languageCtrl = 'Anglais';
+                            print('Anglais séléctionné');
+                            break;
+                          case 'Fr':
+                            languageCtrl = 'Français';
+                            print(languageCtrl + ' séléctionné');
+                            break;
+                          case 'Nl':
+                            languageCtrl = 'Néerlandais';
+                            break;
+                          case 'De':
+                            languageCtrl = 'Allemand';
+                            break;
                         }
                       },
                     );
                   },
                   dropdownColor: Colors.black,
-                  items: lgList.map<DropdownMenuItem<String>>((String value){
+                  items: lgList.map<DropdownMenuItem<String>>((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(value),
@@ -133,7 +135,7 @@ class _NewListScreenState extends State<NewListScreen> {
                       ),
                       validator: (value) {
                         var newValue = value ?? "";
-                        if(newValue.isEmpty) {
+                        if (newValue.isEmpty) {
                           return 'title is required';
                         }
                         return null;
@@ -146,7 +148,58 @@ class _NewListScreenState extends State<NewListScreen> {
                 child: ListView.builder(
                   itemCount: num,
                   itemBuilder: (context, index) {
-                    return AddWordCard();
+                    return Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Container(
+                        width: double.infinity,
+                        height: 150,
+                        decoration: const BoxDecoration(
+                          color: Colors.lightBlueAccent,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(20),
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                  child: SizedBox(
+                                    width: 250,
+                                    height: 50,
+                                    child: WordInput(
+                                      hintText: 'Mot Original',
+                                      onChanged: (value) {
+                                        _wordsList[index].original = value;
+                                        print('original: ' +
+                                            _wordsList[index].original);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15),
+                                  child: SizedBox(
+                                    width: 250,
+                                    height: 50,
+                                    child: WordInput(
+                                      hintText: 'Mot Traduis',
+                                      onChanged: (value) {
+                                        _wordsList[index].translate = value;
+                                        print('traduit: ' +
+                                            _wordsList[index].translate);
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -154,16 +207,29 @@ class _NewListScreenState extends State<NewListScreen> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            print('Edit_List_Screen ' + nameCtrl.text + languageCtrl);
-            ListOfWord result = ListOfWord(name: nameCtrl.text, language: languageCtrl);
-            Navigator.pop(context, result);
+          onPressed: () {
             num = 0;
-            wordList.clear();
+            createListWord(name: nameCtrl.text, langue: languageCtrl, wordList: _wordsList);
+            widgetWordList.clear();
+            ListOfWord result =
+            ListOfWord(name: nameCtrl.text, language: languageCtrl);
+            Navigator.pop(context, result);
           },
           child: Icon(Icons.save),
         ),
       ),
     );
+  }
+
+  Future createListWord({required String name, required String langue, required List<Word> wordList}) async {
+    final docUser = FirebaseFirestore.instance.collection('DocTest').doc(name);
+    final listWords = ListOfWord(
+      name: name,
+      language: langue,
+      words: wordList,
+    );
+    final json = listWords.toJson();
+
+    await docUser.set(json);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
@@ -80,6 +81,7 @@ class _EditListScreenState extends State<EditListScreen> {
                     setState(
                       () {
                         num++;
+                        _wordsList.add(Word.empty());
                       },
                     );
                   },

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/Button/Modif_List_Button.dart';
 import 'package:langame/Class/List_of_Words.dart';
@@ -59,26 +60,18 @@ class _ListScreenState extends State<ListScreen> {
   }
 
   Future<void> _navigatorAndDisplayListAdd(BuildContext context) async {
-    ListOfWord? result = await Navigator.push<ListOfWord>(context,
-        MaterialPageRoute(builder: (BuildContext context) => NewListScreen()));
-    if (result!.name != null) {
-      refresh = true;
-      data.add(ListOfWord(name: result.name, language: result.language));
-      if (!mounted) return;
-      print(result.name + result.language);
-    }
+
   }
 
   Future<void> _navigatorAndDisplayListEdit(BuildContext context, index) async {
-    ListOfWord? result = await Navigator.push<ListOfWord>(context,
-        MaterialPageRoute(builder: (BuildContext context) => EditListScreen(langList: data[index].language, nameList: data[index].name,)));
-    if (result!.name != null) {
-      data[index] = (ListOfWord(name: result.name, language: result.language));
-      if (!mounted) return;
-      print(result.name + result.language);
-      refresh = true;
-    }
+
   }
+
+  Stream<List<ListOfWord>> readListWord() => FirebaseFirestore.instance
+      .collection('List de mots')
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => ListOfWord.fromJson(doc.data())).toList());
 
   @override
   Widget build(BuildContext context) {

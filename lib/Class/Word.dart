@@ -1,18 +1,20 @@
-import 'dart:convert';
-
 class Word {
-  String _original;
-  String _translate;
+  late String original;
+  late String translate;
 
-  Word(this._original, this._translate); // Initialize Constructor
+  Word(this.original, this.translate); // Initialize Constructor
 
-  Word.fromJson(Map<String, dynamic> json)
-      : _original = json['original'],
-        _translate = json['traduit'];
+  Word.empty() {
+    original = "";
+    translate = "";
+  }
 
   Map<String, dynamic> toJson() => {
-    'original': _original,
-    'traduit': _translate,
+    'original' : original,
+    'traduit' : translate,
   };
 
+  factory Word.fromJson(dynamic json) {
+    return Word(json['original'] as String, json['traduit'] as String);
+  }
 }
