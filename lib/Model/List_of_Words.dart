@@ -1,4 +1,4 @@
-import 'package:langame/Class/Word.dart';
+import 'Word.dart';
 
 class ListOfWord
 {
@@ -19,7 +19,6 @@ class ListOfWord
     if(json['words'] != null) {
       var wordObj = json['words'] as List;
       List<Word> wordS = wordObj.map((wordJson) => Word.fromJson(wordJson)).toList();
-      print(' fromJson ${wordS.first.original}');
       return ListOfWord(
         name: json['listName'],
         language: json['listLang'],

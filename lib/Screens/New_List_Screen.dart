@@ -2,10 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
-import 'package:langame/Class/List_of_Words.dart';
-
-import '../Class/Word.dart';
-import '../Partials/Input_Word.dart';
+import 'package:langame/Model/List_of_Words.dart';
+import '../Model/Word.dart';
+import '../Partials/Cards/Input_Word.dart';
 
 const List<String> lgList = <String>['Langue', 'En', 'Fr', 'Nl', 'De'];
 
@@ -25,6 +24,47 @@ class _NewListScreenState extends State<NewListScreen> {
   final List<Word> _wordsList = [];
 
   String dropDownValue = lgList.first;
+
+  Offset _tapPosition = Offset.zero;
+
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  void _showContextMenu(BuildContext context, int index) async {
+    final RenderObject? overlay =
+        Overlay.of(context)?.context.findRenderObject();
+
+    final result = await showMenu(
+      context: context,
+
+      // Show the context menu at the tap location
+      position: RelativeRect.fromRect(
+          Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+          Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+              overlay.paintBounds.size.height)),
+
+      // set a list of choices for the context menu
+      items: [
+        const PopupMenuItem(
+          value: 'Supprimer',
+          child: Text('Supprimer'),
+        ),
+      ],
+    );
+
+    // Implement the logic for each choice here
+    switch (result) {
+      case 'Supprimer':
+        setState(() {
+          _wordsList.removeAt(index);
+          num--;
+        });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -149,53 +189,60 @@ class _NewListScreenState extends State<NewListScreen> {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.all(10),
-                      child: Container(
-                        width: double.infinity,
-                        height: 150,
-                        decoration: const BoxDecoration(
-                          color: Colors.lightBlueAccent,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20),
+                      child: InkWell(
+                        onTapDown: (TapDownDetails details) =>
+                            _getTapPosition(details),
+                        onLongPress: () {
+                          _showContextMenu(context, index);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: const BoxDecoration(
+                            color: Colors.lightBlueAccent,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 50,
-                                    child: WordInput(
-                                      hintText: 'Mot Original',
-                                      onChanged: (value) {
-                                        _wordsList[index].original = value;
-                                        print('original: ' +
-                                            _wordsList[index].original);
-                                      },
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Column(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                    child: SizedBox(
+                                      width: 250,
+                                      height: 50,
+                                      child: WordInput(
+                                        hintText: 'Mot Original',
+                                        onChanged: (value) {
+                                          _wordsList[index].original = value;
+                                          print('original: ' +
+                                              _wordsList[index].original);
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 15),
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 50,
-                                    child: WordInput(
-                                      hintText: 'Mot Traduis',
-                                      onChanged: (value) {
-                                        _wordsList[index].translate = value;
-                                        print('traduit: ' +
-                                            _wordsList[index].translate);
-                                      },
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 15),
+                                    child: SizedBox(
+                                      width: 250,
+                                      height: 50,
+                                      child: WordInput(
+                                        hintText: 'Mot Traduis',
+                                        onChanged: (value) {
+                                          _wordsList[index].translate = value;
+                                          print('traduit: ' +
+                                              _wordsList[index].translate);
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            )
-                          ],
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -208,7 +255,10 @@ class _NewListScreenState extends State<NewListScreen> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             num = 0;
-            createListWord(name: nameCtrl.text, langue: languageCtrl, wordList: _wordsList);
+            createListWord(
+                name: nameCtrl.text,
+                langue: languageCtrl,
+                wordList: _wordsList);
             widgetWordList.clear();
             Navigator.pop(context);
           },
@@ -218,11 +268,13 @@ class _NewListScreenState extends State<NewListScreen> {
     );
   }
 
-  Future createListWord({required String name, required String langue, required List<Word> wordList}) async {
-    if (wordList.isEmpty)
-      {
-        wordList.add(Word.empty());
-      }
+  Future createListWord(
+      {required String name,
+      required String langue,
+      required List<Word> wordList}) async {
+    if (wordList.isEmpty) {
+      wordList.add(Word.empty());
+    }
     final docUser = FirebaseFirestore.instance.collection('list').doc(name);
     final listWords = ListOfWord(
       name: name,

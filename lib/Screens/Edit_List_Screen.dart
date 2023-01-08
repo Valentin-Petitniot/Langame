@@ -2,13 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
-import 'package:langame/Cards/List_Cards.dart';
-import 'package:langame/Class/List_of_Words.dart';
-
-import '../Class/Word.dart';
-import '../Partials/Input_Word.dart';
-
-const List<String> lgList = <String>['Langue', 'En', 'Fr', 'Nl', 'De'];
+import 'package:langame/Partials/Cards/List_Cards.dart';
+import '../Model/List_of_Words.dart';
+import '../Model/Word.dart';
+import '../Partials/Cards/Input_Word.dart';
 
 class EditListScreen extends StatefulWidget {
   const EditListScreen(
@@ -24,36 +21,16 @@ class EditListScreen extends StatefulWidget {
 final List<Widget> widgetWordList = [];
 int num = 0;
 
-String initialValueDropDown(String rcvLang) {
-  String result = 'Langue';
-
-  switch (rcvLang) {
-    case 'Anglais':
-      result = 'En';
-      break;
-    case 'Français':
-      result = 'Fr';
-      break;
-    case 'Allemand':
-      result = 'De';
-      break;
-    case 'Néerlandais':
-      result = 'Nl';
-      break;
-  }
-
-  return result;
-}
 
 class _EditListScreenState extends State<EditListScreen> {
-  TextEditingController nameCtrl = TextEditingController();
-  late String languageCtrl;
   late  List<Word> _wordsList = [];
 
-  String dropDownValue = lgList.first;
+  /// Update the firebase document.
+  /// If the list is empty, the methode add an object in the list
+  /// to avoid problem in the firebase document
+  Future editListWord({required String name, required String langue, required List<Word> wordList}) async {
 
-
-  Future EditListWord({required String name, required String langue, required List<Word> wordList}) async {
+    // Si la lite est vide, ajout d'un objet vide pour ne pas avoir de problème dans Firebase
     if (wordList.isEmpty)
     {
       wordList.add(Word.empty());
@@ -69,12 +46,51 @@ class _EditListScreenState extends State<EditListScreen> {
     await docUser.update(json);
   }
 
-
   @override
   void initState() {
     _wordsList = widget.lists.words!;
     num = _wordsList.length;
     super.initState();
+  }
+
+  Offset _tapPosition = Offset.zero;
+  void _getTapPosition(TapDownDetails details) {
+    final RenderBox referenceBox = context.findRenderObject() as RenderBox;
+    setState(() {
+      _tapPosition = referenceBox.globalToLocal(details.globalPosition);
+    });
+  }
+
+  void _showContextMenu(BuildContext context, int index) async {
+    final RenderObject? overlay =
+    Overlay.of(context)?.context.findRenderObject();
+
+    final result = await showMenu(
+      context: context,
+
+      // Show the context menu at the tap location
+      position: RelativeRect.fromRect(
+          Rect.fromLTWH(_tapPosition.dx, _tapPosition.dy, 30, 30),
+          Rect.fromLTWH(0, 0, overlay!.paintBounds.size.width,
+              overlay.paintBounds.size.height)),
+
+      // set a list of choices for the context menu
+      items: [
+        const PopupMenuItem(
+          value: 'Supprimer',
+          child: Text('Supprimer'),
+        ),
+      ],
+    );
+
+    // Implement the logic for each choice here
+    switch (result) {
+      case 'Supprimer':
+        setState(() {
+          _wordsList.removeAt(index);
+          num--;
+        });
+    }
   }
 
   @override
@@ -91,7 +107,7 @@ class _EditListScreenState extends State<EditListScreen> {
             children: [
               Padding(
                 padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width / 6),
+                    left: MediaQuery.of(context).size.width / 7),
               ),
               Icon(Icons.list),
               Padding(
@@ -127,53 +143,52 @@ class _EditListScreenState extends State<EditListScreen> {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: EdgeInsets.all(10),
-                      child: Container(
-                        width: double.infinity,
-                        height: 150,
-                        decoration: const BoxDecoration(
-                          color: Colors.lightBlueAccent,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(20),
+                      child: InkWell(
+                        onTapDown: (TapDownDetails details) => _getTapPosition(details),
+                        onLongPress: () {
+                          _showContextMenu(context, index);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 150,
+                          decoration: const BoxDecoration(
+                            color: Colors.lightBlueAccent,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(20),
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 50,
-                                    child: WordInput(
-                                      hintText: 'Mot Original',
-                                      label:  _wordsList[index].original,
-                                      onChanged: (value){
-                                        _wordsList[index].original = value;
-                                        print('original: ' + _wordsList[index].original);
-                                      },
-                                    ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(25, 10, 25, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: WordInput(
+                                    hintText: 'Mot Original',
+                                    label:  _wordsList[index].original,
+                                    onChanged: (value){
+                                      _wordsList[index].original = value;
+                                      print('original: ' + _wordsList[index].original);
+                                    },
                                   ),
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 15),
-                                  child: SizedBox(
-                                    width: 250,
-                                    height: 50,
-                                    child: WordInput(
-                                      hintText: 'Mot Traduis',
-                                      label: _wordsList[index].translate,
-                                      onChanged: (value){
-                                        _wordsList[index].translate = value;
-                                        print('traduit: ' + _wordsList[index].translate);
-                                      },
-                                    ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(25, 5, 25, 0),
+                                child: SizedBox(
+                                  height: 50,
+                                  child: WordInput(
+                                    hintText: 'Mot Traduis',
+                                    label: _wordsList[index].translate,
+                                    onChanged: (value){
+                                      _wordsList[index].translate = value;
+                                      print('traduit: ' + _wordsList[index].translate);
+                                    },
                                   ),
                                 ),
-                              ],
-                            )
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -185,7 +200,7 @@ class _EditListScreenState extends State<EditListScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            EditListWord(name: widget.lists.name, langue: widget.lists.language, wordList: _wordsList);
+            editListWord(name: widget.lists.name, langue: widget.lists.language, wordList: _wordsList);
             Navigator.pop(context);
           },
           child: Icon(Icons.save),

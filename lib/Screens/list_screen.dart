@@ -1,12 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:langame/Button/Modif_List_Button.dart';
-import 'package:langame/Class/List_of_Words.dart';
 
-import 'package:langame/Routes/router.dart';
-import 'package:langame/Cards/List_Cards.dart';
+import 'package:langame/Button/Modif_List_Button.dart';
+import 'package:langame/Partials/Cards/List_Cards.dart';
 import 'package:langame/Screens/Edit_List_Screen.dart';
 import 'package:langame/Screens/New_List_Screen.dart';
+import 'package:langame/Screens/View_Words_List_Screen.dart';
+import '../Model/List_of_Words.dart';
 
 
 class ListScreen extends StatefulWidget {
@@ -70,6 +70,11 @@ class _ListScreenState extends State<ListScreen> {
         ));
   }
 
+  Future<void> _navigatorAndDisplayList(BuildContext context, ListOfWord list) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => ViewWordsListScreen(listOfWord: list)));
+  }
+
   Future<void> _navigatorAndDisplayListEdit(BuildContext context, ListOfWord list) async {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => EditListScreen(lists: list)));
@@ -83,7 +88,7 @@ class _ListScreenState extends State<ListScreen> {
 
   Widget buildLists(ListOfWord lists) => InkWell(
     onTap: (){
-          Navigator.pushNamed(context, kViewWordList);
+          _navigatorAndDisplayList(context, lists);
         },
     onTapDown: (TapDownDetails details) => _getTapPosition(details),
     onLongPress: () {
@@ -106,30 +111,13 @@ class _ListScreenState extends State<ListScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Padding(
-              padding:
-                  EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
-            ),
             Icon(Icons.list),
             Padding(
               padding: EdgeInsets.only(left: 10),
             ),
             Text('Listes de mots'),
-          ],
-        ),
-      ),
-      drawer: Drawer(
-        width: MediaQuery.of(context).size.width / 2,
-        child: ListView(
-          children: [
-            ListTile(
-              leading: Icon(Icons.list),
-              title: Text('Listes'),
-              onTap: () {
-                Navigator.pushNamed(context, kListRoute);
-              },
-            )
           ],
         ),
       ),
