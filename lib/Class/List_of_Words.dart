@@ -15,19 +15,20 @@ class ListOfWord
     }).toList(),
   };
 
-  static ListOfWord fromJson(Map<String, dynamic> json){
+  factory ListOfWord.fromJson(Map<String, dynamic> json){
     if(json['words'] != null) {
       var wordObj = json['words'] as List;
       List<Word> wordS = wordObj.map((wordJson) => Word.fromJson(wordJson)).toList();
+      print(' fromJson ${wordS.first.original}');
       return ListOfWord(
-        name: ['listName'] as String,
-        language: ['listLang'] as String,
+        name: json['listName'],
+        language: json['listLang'],
         words: wordS
       );
     } else {
       return ListOfWord(
-        name: ['listName'] as String,
-        language: ['listLang'] as String,
+        name: json['listName'],
+        language: json['listLang'],
       );
     }
   }

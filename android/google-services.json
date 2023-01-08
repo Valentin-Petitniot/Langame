@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "273010627858",
+    "project_id": "langame-64b85",
+    "storage_bucket": "langame-64b85.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273010627858:android:0190ab5292b51af6cacfcb",
+        "android_client_info": {
+          "package_name": "com.example.langame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273010627858-9vflma6g46gjf2l4t3m61qtmqfsl0ms4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTofTK4jAKWyUZYG9Lc7m6uzsexW97ZKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273010627858-9vflma6g46gjf2l4t3m61qtmqfsl0ms4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

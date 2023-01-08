@@ -12,11 +12,10 @@ const List<String> lgList = <String>['Langue', 'En', 'Fr', 'Nl', 'De'];
 
 class EditListScreen extends StatefulWidget {
   const EditListScreen(
-      {Key? key, required this.nameList, required this.langList})
+      {Key? key, required this.lists})
       : super(key: key);
 
-  final String nameList;
-  final String langList;
+  final ListOfWord lists;
 
   @override
   State<EditListScreen> createState() => _EditListScreenState();
@@ -49,9 +48,34 @@ String initialValueDropDown(String rcvLang) {
 class _EditListScreenState extends State<EditListScreen> {
   TextEditingController nameCtrl = TextEditingController();
   late String languageCtrl;
-  final List<Word> _wordsList = [];
+  late  List<Word> _wordsList = [];
 
   String dropDownValue = lgList.first;
+
+
+  Future EditListWord({required String name, required String langue, required List<Word> wordList}) async {
+    if (wordList.isEmpty)
+    {
+      wordList.add(Word.empty());
+    }
+    final docUser = FirebaseFirestore.instance.collection('list').doc(name);
+    final listWords = ListOfWord(
+      name: name,
+      language: langue,
+      words: wordList,
+    );
+    final json = listWords.toJson();
+
+    await docUser.update(json);
+  }
+
+
+  @override
+  void initState() {
+    _wordsList = widget.lists.words!;
+    num = _wordsList.length;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +120,7 @@ class _EditListScreenState extends State<EditListScreen> {
           color: Colors.black54,
           child: Column(
             children: [
-              ListCards(name: widget.nameList, language: widget.langList),
+              ListCards(name: widget.lists.name, language: widget.lists.language),
               Expanded(
                 child: ListView.builder(
                   itemCount: num,
@@ -124,6 +148,7 @@ class _EditListScreenState extends State<EditListScreen> {
                                     height: 50,
                                     child: WordInput(
                                       hintText: 'Mot Original',
+                                      label:  _wordsList[index].original,
                                       onChanged: (value){
                                         _wordsList[index].original = value;
                                         print('original: ' + _wordsList[index].original);
@@ -138,6 +163,7 @@ class _EditListScreenState extends State<EditListScreen> {
                                     height: 50,
                                     child: WordInput(
                                       hintText: 'Mot Traduis',
+                                      label: _wordsList[index].translate,
                                       onChanged: (value){
                                         _wordsList[index].translate = value;
                                         print('traduit: ' + _wordsList[index].translate);
@@ -159,12 +185,8 @@ class _EditListScreenState extends State<EditListScreen> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
-            num = 0;
-            widgetWordList.clear();
-            ListOfWord result =
-                ListOfWord(name: widget.nameList, language: widget.langList);
-            Navigator.pop(context, result);
-
+            EditListWord(name: widget.lists.name, langue: widget.lists.language, wordList: _wordsList);
+            Navigator.pop(context);
           },
           child: Icon(Icons.save),
         ),

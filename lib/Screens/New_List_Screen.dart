@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:langame/Button/Add_Word_Button.dart';
-import 'package:langame/Cards/Add_Word_Card.dart';
 import 'package:langame/Class/List_of_Words.dart';
 
 import '../Class/Word.dart';
@@ -211,9 +210,7 @@ class _NewListScreenState extends State<NewListScreen> {
             num = 0;
             createListWord(name: nameCtrl.text, langue: languageCtrl, wordList: _wordsList);
             widgetWordList.clear();
-            ListOfWord result =
-            ListOfWord(name: nameCtrl.text, language: languageCtrl);
-            Navigator.pop(context, result);
+            Navigator.pop(context);
           },
           child: Icon(Icons.save),
         ),
@@ -222,7 +219,11 @@ class _NewListScreenState extends State<NewListScreen> {
   }
 
   Future createListWord({required String name, required String langue, required List<Word> wordList}) async {
-    final docUser = FirebaseFirestore.instance.collection('DocTest').doc(name);
+    if (wordList.isEmpty)
+      {
+        wordList.add(Word.empty());
+      }
+    final docUser = FirebaseFirestore.instance.collection('list').doc(name);
     final listWords = ListOfWord(
       name: name,
       language: langue,

@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:langame/Button/Modif_List_Button.dart';
 import 'package:langame/Class/List_of_Words.dart';
-import 'package:langame/Class/Word.dart';
 
 import 'package:langame/Routes/router.dart';
 import 'package:langame/Cards/List_Cards.dart';
 import 'package:langame/Screens/Edit_List_Screen.dart';
 import 'package:langame/Screens/New_List_Screen.dart';
+
 
 class ListScreen extends StatefulWidget {
   const ListScreen({Key? key}) : super(key: key);
@@ -17,8 +17,6 @@ class ListScreen extends StatefulWidget {
 }
 
 class _ListScreenState extends State<ListScreen> {
-  List<ListOfWord> data = [];
-  bool refresh = false;
   Offset _tapPosition = Offset.zero;
 
   void _getTapPosition(TapDownDetails details) {
@@ -28,7 +26,7 @@ class _ListScreenState extends State<ListScreen> {
     });
   }
 
-  void _showContextMenu(BuildContext context, index) async {
+  void _showContextMenu(BuildContext context, String docName) async {
     final RenderObject? overlay =
         Overlay.of(context)?.context.findRenderObject();
 
@@ -54,94 +52,108 @@ class _ListScreenState extends State<ListScreen> {
     switch (result) {
       case 'Supprimer':
         setState(() {
-          data.removeAt(index);
+          DeleteListWord(name: docName);
         });
     }
   }
 
-  Future<void> _navigatorAndDisplayListAdd(BuildContext context) async {
-
+  Future DeleteListWord({required String name}) async {
+    final docUser = FirebaseFirestore.instance.collection('list').doc(name);
+    await docUser.delete();
   }
 
-  Future<void> _navigatorAndDisplayListEdit(BuildContext context, index) async {
+  Future<void> _navigatorAndDisplayListAdd(BuildContext context) async {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => NewListScreen(),
+        ));
+  }
 
+  Future<void> _navigatorAndDisplayListEdit(BuildContext context, ListOfWord list) async {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => EditListScreen(lists: list)));
   }
 
   Stream<List<ListOfWord>> readListWord() => FirebaseFirestore.instance
-      .collection('List de mots')
+      .collection('list')
       .snapshots()
       .map((snapshot) =>
           snapshot.docs.map((doc) => ListOfWord.fromJson(doc.data())).toList());
 
+  Widget buildLists(ListOfWord lists) => InkWell(
+    onTap: (){
+          Navigator.pushNamed(context, kViewWordList);
+        },
+    onTapDown: (TapDownDetails details) => _getTapPosition(details),
+    onLongPress: () {
+      _showContextMenu(context, lists.name);
+    },
+    child: ListCards(
+      name: lists.name,
+      language: lists.language,
+      child: ModifListButton(
+            onPressed: () {
+              _navigatorAndDisplayListEdit(context, lists);
+            },
+          ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          title: Row(
-            children: [
-              Padding(
-                padding: EdgeInsets.only(
-                    left: MediaQuery.of(context).size.width / 6),
-              ),
-              Icon(Icons.list),
-              Padding(
-                padding: EdgeInsets.only(left: 10),
-              ),
-              Text('Listes de mots'),
-            ],
-          ),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        title: Row(
+          children: [
+            Padding(
+              padding:
+                  EdgeInsets.only(left: MediaQuery.of(context).size.width / 6),
+            ),
+            Icon(Icons.list),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+            ),
+            Text('Listes de mots'),
+          ],
         ),
-        drawer: Drawer(
-          width: MediaQuery.of(context).size.width / 2,
-          child: ListView(
-            children: [
-              ListTile(
-                leading: Icon(Icons.list),
-                title: Text('Listes'),
-                onTap: () {
-                  Navigator.pushNamed(context, kListRoute);
-                },
-              )
-            ],
-          ),
+      ),
+      drawer: Drawer(
+        width: MediaQuery.of(context).size.width / 2,
+        child: ListView(
+          children: [
+            ListTile(
+              leading: Icon(Icons.list),
+              title: Text('Listes'),
+              onTap: () {
+                Navigator.pushNamed(context, kListRoute);
+              },
+            )
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            refresh = false;
-            _navigatorAndDisplayListAdd(context);
-          },
-          child: Icon(Icons.add),
-        ),
-        body: data.isNotEmpty
-            ? Container(
-                color: Colors.black54,
-                width: double.infinity,
-                height: double.infinity,
-                child: ListView.builder(
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTapDown: (details) => _getTapPosition(details),
-                      onLongPress: () {
-                        _showContextMenu(context, index);
-                      },
-                      child: ListCards(
-                        name: data[index].name,
-                        language: data[index].language,
-                        child: ModifListButton(
-                          onPressed: () {
-                            refresh = false;
-                            _navigatorAndDisplayListEdit(context, index);
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              )
-            : const Center(
-                child: Text('Pas de liste enregistrer'),
-              ));
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _navigatorAndDisplayListAdd(context);
+        },
+        child: const Icon(Icons.add),
+      ),
+      body: StreamBuilder<List<ListOfWord>>(
+        stream: readListWord(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong! ${snapshot.error.toString()}');
+          } else if (snapshot.hasData) {
+            final lists = snapshot.data!;
+            return ListView(
+              children: lists.map(buildLists).toList(),
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    );
   }
 }

@@ -5,8 +5,8 @@ class Word {
   Word(this.original, this.translate); // Initialize Constructor
 
   Word.empty() {
-    original = "";
-    translate = "";
+    original = '';
+    translate = '';
   }
 
   Map<String, dynamic> toJson() => {
@@ -14,7 +14,7 @@ class Word {
     'traduit' : translate,
   };
 
-  factory Word.fromJson(dynamic json) {
-    return Word(json['original'] as String, json['traduit'] as String);
+  factory Word.fromJson(Map<String, dynamic> json) {
+    return Word(json['original'], json['traduit']);
   }
 }
